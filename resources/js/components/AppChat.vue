@@ -83,31 +83,31 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
-        <div class="flex h-80 flex-col justify-end">
+    <div class="h-full">
+        <div class="flex h-[calc(100%-60px)] flex-col justify-end">
             <div ref="messagesContainer" class="max-h-fit overflow-y-auto p-4">
                 <div v-for="message in messages" :key="message.id" class="mb-2 flex items-center">
                     <div v-if="message.sender_id === currentUser.id" class="ml-auto rounded-lg bg-blue-500 p-2 text-white">
                         {{ message.text }}
                     </div>
-                    <div v-else class="mr-auto rounded-lg bg-gray-200 p-2">
+                    <div v-else class="mr-auto rounded-lg bg-gray-200 text-black p-2">
                         {{ message.text }}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="flex items-center">
+        <small v-if="isFriendTyping" class="text-gray-700"> {{ friend.name }} is typing... </small>
+        <div class="w-full flex items-center absolute bottom-0">
             <input
                 type="text"
                 v-model="newMessage"
                 @keydown="sendTypingEvent"
                 @keyup.enter="sendMessage"
                 placeholder="Type a message..."
-                class="flex-1 rounded-lg border px-2 py-1"
+                class="h-[50px] flex-1 rounded-bl-lg border px-2"
             />
-            <button @click="sendMessage" class="ml-2 rounded-lg bg-blue-500 px-4 py-1 text-white">Send</button>
+            <button @click="sendMessage" class="h-[50px] rounded-br-lg bg-blue-500 px-4 text-white">Send</button>
         </div>
-        <small v-if="isFriendTyping" class="text-gray-700"> {{ friend.name }} is typing... </small>
     </div>
 </template>
 
