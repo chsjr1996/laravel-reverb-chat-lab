@@ -106,7 +106,7 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <small v-if="someIsTyping" class="text-gray-700"> {{ isTypingUser?.name }} is typing... </small>
+        <small v-if="someIsTyping" class="absolute bottom-[55px] left-[10px] text-gray-500"> {{ isTypingUser?.name }} is typing... </small>
         <div class="absolute bottom-0 flex w-full items-center">
             <input
                 type="text"

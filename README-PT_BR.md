@@ -75,7 +75,7 @@ OBS: Você pode logar com o 'user2@example.com' para visualizar melhor o chat em
 - [x] Acrescentar tipagem no componente do chat
 - [ ] Melhorar visual do chat:
     - [ ] scroll apenas no container do chat não na tela inteira
-    - [ ] disposição do componente 'digitando';
+    - [x] disposição do componente 'digitando';
     - [ ] mostrar se usuário está online/offline;
     - [ ] permitir criar grupos de conversa (adicionar mais de um usuário na conversa);
     - [ ] permitir anexar imagens e enviar emojis nas mensagens;

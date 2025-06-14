@@ -75,7 +75,7 @@ NOTE: You can log in with 'user2@example.com' to better view the chat in real ti
 - [x] Add typing in the chat component
 - [ ] Improve the chat's visual appearance:
     - [ ] scroll only in the chat container, not in the entire screen
-    - [ ] layout of the 'typing' component;
+    - [x] layout of the 'typing' component;
     - [ ] show if the user is online/offline;
     - [ ] allow creating conversation groups (add more than one user to the conversation);
     - [ ] allow attaching images and sending emojis in messages;
