@@ -36,6 +36,16 @@ export interface User {
     updated_at: string;
 }
 
+export interface Message {
+    id: number,
+    chat_room_id: number,
+    user_id: number,
+    text: string,
+    created_at: string,
+    updated_at: string,
+    deleted_at?: string | null,
+}
+
 export interface ChatRoom {
     id: number;
     name: string;

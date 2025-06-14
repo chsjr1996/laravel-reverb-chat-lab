@@ -1,14 +1,18 @@
 <script setup lang="ts">
 /**
- * @todo missing types
- * @todo allow to detect who is someoneIsTyping
+ * @todo allow to detect multiple users typing at the same time
  */
 
-import { type ChatRoom, type SharedData, type User } from '@/types';
+import { type ChatRoom, type Message, type SharedData, type User } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { useEcho } from '@laravel/echo-vue';
 import axios from 'axios';
 import { nextTick, onMounted, ref, watch } from 'vue';
+
+type whisperTypingResponse = {
+    userID: number;
+    userName: string;
+};
 
 const props = defineProps<{
     room: ChatRoom;
@@ -19,16 +23,19 @@ const currentUser = page.props.auth.user as User;
 
 const roomEcho = useEcho(`chat.room.${props.room.id}`);
 
-const messages = ref([]);
+const messages = ref<Message[]>([]);
 const newMessage = ref('');
-const messagesContainer = ref(null);
+const messagesContainer = ref<HTMLDivElement | null>(null);
 const someIsTyping = ref(false);
-const someIsTypingTimer = ref(null);
+const someIsTypingTimer = ref<number | null>(null);
+const isTypingUser = ref<Pick<User, 'id' | 'name'> | null>(null);
 
 watch(
     messages,
     () => {
         nextTick(() => {
+            if (!messagesContainer.value) return;
+
             messagesContainer.value.scrollTo({
                 top: messagesContainer.value.scrollHeight,
                 behavior: 'smooth',
@@ -44,7 +51,7 @@ const sendMessage = () => {
             .post(`/chat/room/${props.room.id}/message`, {
                 text: newMessage.value,
             })
-            .then((response) => {
+            .then(() => {
                 newMessage.value = '';
             });
     }
@@ -53,6 +60,7 @@ const sendMessage = () => {
 const sendTypingEvent = () => {
     roomEcho.channel().whisper('typing', {
         userID: currentUser.id,
+        userName: currentUser.name,
     });
 };
 
@@ -63,11 +71,15 @@ onMounted(() => {
 
     roomEcho
         .channel()
-        .listen('MessageSent', (response) => {
+        .listen('MessageSent', (response: { message: Message }) => {
             messages.value.push(response.message);
         })
-        .listenForWhisper('typing', (response) => {
+        .listenForWhisper('typing', (response: whisperTypingResponse) => {
             someIsTyping.value = true;
+            isTypingUser.value = {
+                id: response.userID,
+                name: response.userName,
+            };
 
             if (someIsTypingTimer.value) {
                 clearTimeout(someIsTypingTimer.value);
@@ -94,7 +106,7 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <small v-if="someIsTyping" class="text-gray-700"> Someone is typing... </small>
+        <small v-if="someIsTyping" class="text-gray-700"> {{ isTypingUser?.name }} is typing... </small>
         <div class="absolute bottom-0 flex w-full items-center">
             <input
                 type="text"
