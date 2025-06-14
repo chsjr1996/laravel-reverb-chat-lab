@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chat_messages', function (Blueprint $table) {
+        Schema::create('chat_rooms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('receiver_id');
-            $table->foreignId('sender_id');
-            $table->text('text');
+            $table->string('name')->nullable();
+            $table->boolean('is_group')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chat_messages');
+        Schema::dropIfExists('chat_rooms');
     }
 };

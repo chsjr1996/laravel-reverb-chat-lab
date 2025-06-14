@@ -1,30 +1,29 @@
 <script setup lang="ts">
 /**
  * @todo missing types
+ * @todo allow to detect who is someoneIsTyping
  */
 
-import { type SharedData, type User } from '@/types';
+import { type ChatRoom, type SharedData, type User } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { useEcho } from '@laravel/echo-vue';
 import axios from 'axios';
 import { nextTick, onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
-    friend: User;
+    room: ChatRoom;
 }>();
 
 const page = usePage<SharedData>();
 const currentUser = page.props.auth.user as User;
 
-// TODO: Use unified channel here, fix auth and typing event problems!
-const fromEcho = useEcho(`chat.${currentUser.id}`);
-const toEcho = useEcho(`chat.${props.friend.id}`);
+const roomEcho = useEcho(`chat.room.${props.room.id}`);
 
 const messages = ref([]);
 const newMessage = ref('');
 const messagesContainer = ref(null);
-const isFriendTyping = ref(false);
-const isFriendTypingTimer = ref(null);
+const someIsTyping = ref(false);
+const someIsTypingTimer = ref(null);
 
 watch(
     messages,
@@ -42,41 +41,40 @@ watch(
 const sendMessage = () => {
     if (newMessage.value.trim() !== '') {
         axios
-            .post(`/chat/messages/${props.friend.id}`, {
+            .post(`/chat/room/${props.room.id}/message`, {
                 text: newMessage.value,
             })
             .then((response) => {
-                messages.value.push(response.data);
                 newMessage.value = '';
             });
     }
 };
 
 const sendTypingEvent = () => {
-    fromEcho.channel().whisper('typing', {
+    roomEcho.channel().whisper('typing', {
         userID: currentUser.id,
     });
 };
 
 onMounted(() => {
-    axios.get(`/chat/messages/${props.friend.id}`).then((response) => {
+    axios.get(`/chat/room/${props.room.id}/message`).then((response) => {
         messages.value = response.data;
     });
 
-    toEcho.channel()
+    roomEcho
+        .channel()
         .listen('MessageSent', (response) => {
             messages.value.push(response.message);
         })
         .listenForWhisper('typing', (response) => {
-            console.log('???');
-            isFriendTyping.value = response.userID === props.friend.id;
+            someIsTyping.value = true;
 
-            if (isFriendTypingTimer.value) {
-                clearTimeout(isFriendTypingTimer.value);
+            if (someIsTypingTimer.value) {
+                clearTimeout(someIsTypingTimer.value);
             }
 
-            isFriendTypingTimer.value = setTimeout(() => {
-                isFriendTyping.value = false;
+            someIsTypingTimer.value = setTimeout(() => {
+                someIsTyping.value = false;
             }, 1000);
         });
 });
@@ -87,17 +85,17 @@ onMounted(() => {
         <div class="flex h-[calc(100%-60px)] flex-col justify-end">
             <div ref="messagesContainer" class="max-h-fit overflow-y-auto p-4">
                 <div v-for="message in messages" :key="message.id" class="mb-2 flex items-center">
-                    <div v-if="message.sender_id === currentUser.id" class="ml-auto rounded-lg bg-blue-500 p-2 text-white">
+                    <div v-if="message.user_id === currentUser.id" class="ml-auto rounded-lg bg-blue-500 p-2 text-white">
                         {{ message.text }}
                     </div>
-                    <div v-else class="mr-auto rounded-lg bg-gray-200 text-black p-2">
+                    <div v-else class="mr-auto rounded-lg bg-gray-200 p-2 text-black">
                         {{ message.text }}
                     </div>
                 </div>
             </div>
         </div>
-        <small v-if="isFriendTyping" class="text-gray-700"> {{ friend.name }} is typing... </small>
-        <div class="w-full flex items-center absolute bottom-0">
+        <small v-if="someIsTyping" class="text-gray-700"> Someone is typing... </small>
+        <div class="absolute bottom-0 flex w-full items-center">
             <input
                 type="text"
                 v-model="newMessage"

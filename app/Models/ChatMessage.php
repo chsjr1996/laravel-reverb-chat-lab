@@ -5,7 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * Class ChatMessage
+ *
+ * Represents a chat message in the application.
+ *
+ * @property int $id
+ * @property int $chat_room_id
+ * @property string $text
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class ChatMessage extends Model
 {
     use HasFactory;
@@ -16,18 +29,13 @@ class ChatMessage extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'sender_id',
-        'receiver_id',
+        'chat_room_id',
+        'user_id',
         'text',
     ];
 
-    public function sender(): BelongsTo
+    public function room(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'sender_id');
-    }
-
-    public function receiver(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'receiver_id');
+        return $this->belongsTo(ChatRoom::class, 'chat_room_id');
     }
 }

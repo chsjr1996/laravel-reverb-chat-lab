@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
 use App\Models\ChatMessage;
-use App\Models\User;
+use App\Models\ChatRoom;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Inertia\Response as InertiaResponse;
@@ -12,38 +12,32 @@ use Inertia\ResponseFactory;
 
 class ChatRoomController extends Controller
 {
-    public function show(User $friend): InertiaResponse|ResponseFactory
+    public function show(ChatRoom $chatRoom): InertiaResponse|ResponseFactory
     {
+        $chatRoom->load('users');
+
         return inertia('Chat', [
-            'friend' => $friend,
+            'room' => $chatRoom,
         ]);
     }
 
-    public function index(User $friend): Collection
+    public function index(ChatRoom $chatRoom): Collection
     {
         return ChatMessage::query()
-            ->where(fn ($query) => $query
-                ->where('sender_id', auth()->id())
-                ->orWhere('receiver_id', $friend->id)
-            )
-            ->orWhere(fn ($query) => $query
-                ->where('sender_id', $friend->id)
-                ->orWhere('receiver_id', auth()->id())
-            )
-            ->with(['sender', 'receiver'])
+            ->where('chat_room_id', $chatRoom->id)
             ->orderBy('id', 'asc')
             ->get();
     }
 
-    public function store(Request $request, User $friend)
+    public function store(Request $request, ChatRoom $chatRoom)
     {
         $validated = $request->validate([
             'text' => 'required|string|max:255',
         ]);
 
         $message = ChatMessage::create([
-            'sender_id' => auth()->id(),
-            'receiver_id' => $friend->id,
+            'chat_room_id' => $chatRoom->id,
+            'user_id' => auth()->user()->id,
             'text' => $validated['text'],
         ]);
 

@@ -36,4 +36,13 @@ export interface User {
     updated_at: string;
 }
 
+export interface ChatRoom {
+    id: number;
+    name: string;
+    is_group?: boolean;
+    created_at: string;
+    updated_at: string;
+    users: User[];
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
