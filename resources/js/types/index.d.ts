@@ -44,15 +44,18 @@ export interface Message {
     created_at: string,
     updated_at: string,
     deleted_at?: string | null,
+    user?: Pick<User, 'id' | 'name' | 'avatar'>,
 }
 
 export interface ChatRoom {
     id: number;
     name: string;
+    avatar?: string;
     is_group?: boolean;
     created_at: string;
     updated_at: string;
     users: User[];
+    messages?: Message[];
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

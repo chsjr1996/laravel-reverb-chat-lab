@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -33,5 +36,26 @@ class ChatRoom extends Model
             'id',
             'user_id'
         );
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
+    }
+
+    #[Scope]
+    protected function withCurrentUser(Builder $query): void
+    {
+        $query->whereHas('users', function ($query) {
+            $query->where('user_id', auth()->id());
+        })->with('users');
+    }
+
+    #[Scope]
+    protected function withLastMessage(Builder $query): void
+    {
+        $query->with(['messages' => function ($query) {
+            $query->latest()->take(1);
+        }]);
     }
 }

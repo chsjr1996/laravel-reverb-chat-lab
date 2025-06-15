@@ -14,6 +14,7 @@ class ChatMessageController extends Controller
     {
         return ChatMessage::query()
             ->where('chat_room_id', $chatRoom->id)
+            ->with('user:id,name')
             ->orderBy('id', 'asc')
             ->get();
     }

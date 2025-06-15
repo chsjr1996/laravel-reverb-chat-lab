@@ -108,6 +108,7 @@ onMounted(() => {
                         <span class="text-[9px] block text-right">{{ formatTime(message.created_at) }}</span>
                     </div>
                     <div v-else class="mr-auto rounded-lg bg-gray-200 px-4 py-2 text-black">
+                        <strong v-if="room.is_group">{{ message.user!.name }}</strong>
                         <p>{{ message.text }}</p>
                         <span class="text-[9px] block text-right">{{ formatTime(message.created_at) }}</span>
                     </div>
@@ -122,7 +123,7 @@ onMounted(() => {
                 @keydown="sendTypingEvent"
                 @keyup.enter="sendMessage"
                 placeholder="Type a message..."
-                class="h-[50px] flex-1 rounded-bl-lg border px-2"
+                class="h-[50px] flex-1 border-t px-2"
             />
             <button @click="sendMessage" class="h-[50px] rounded-br-lg bg-blue-500 px-4 text-white">Send</button>
         </div>

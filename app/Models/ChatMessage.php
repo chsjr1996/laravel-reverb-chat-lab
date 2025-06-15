@@ -38,4 +38,9 @@ class ChatMessage extends Model
     {
         return $this->belongsTo(ChatRoom::class, 'chat_room_id');
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

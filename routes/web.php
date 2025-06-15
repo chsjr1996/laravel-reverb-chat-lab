@@ -8,6 +8,7 @@ Route::get('/', [WelcomeController::class, 'show'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(callback: function () {
     require __DIR__.'/web-modules/chat.php';
+    require __DIR__.'/web-modules/user.php';
 
     Route::get('dashboard', [DashboardController::class, 'show'])->name('dashboard');
 });

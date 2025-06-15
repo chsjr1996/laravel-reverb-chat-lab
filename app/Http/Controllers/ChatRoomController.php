@@ -8,16 +8,28 @@ use Inertia\ResponseFactory;
 
 class ChatRoomController extends Controller
 {
+    /**
+     * @noinspection PhpDynamicAsStaticMethodCallInspection
+     */
     public function index(): InertiaResponse|ResponseFactory
     {
-        return inertia('Chat/Rooms');
+        $chatRooms = ChatRoom::withCurrentUser()->withLastMessage()->get();
+
+        return inertia('Chat', [
+            'rooms' => $chatRooms,
+        ]);
     }
 
+    /**
+     * @noinspection PhpDynamicAsStaticMethodCallInspection
+     */
     public function show(ChatRoom $chatRoom): InertiaResponse|ResponseFactory
     {
+        $chatRooms = ChatRoom::withCurrentUser()->withLastMessage()->get();
         $chatRoom->load('users');
 
         return inertia('Chat', [
+            'rooms' => $chatRooms,
             'room' => $chatRoom,
         ]);
     }
