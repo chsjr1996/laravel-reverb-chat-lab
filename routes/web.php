@@ -11,6 +11,10 @@ Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-require __DIR__.'/web-modules/chat.php';
+Route::middleware('auth')->prefix('chat')->name('chat')->group(function () {
+    require __DIR__.'/web-modules/chat-rooms.php';
+    require __DIR__.'/web-modules/chat-messages.php';
+});
+
 require __DIR__.'/web-modules/settings.php';
 require __DIR__.'/web-modules/auth.php';

@@ -3,11 +3,12 @@
  * @todo allow to detect multiple users typing at the same time
  */
 
+import { getMessages, saveMessage } from '@/services/chatMessageService';
 import { type ChatRoom, type Message, type SharedData, type User } from '@/types';
 import { usePage } from '@inertiajs/vue3';
 import { useEcho } from '@laravel/echo-vue';
-import axios from 'axios';
 import { nextTick, onMounted, ref, watch } from 'vue';
+import { formatTime } from '@/lib/utils';
 
 type whisperTypingResponse = {
     userID: number;
@@ -18,10 +19,9 @@ const props = defineProps<{
     room: ChatRoom;
 }>();
 
+const roomEcho = useEcho(`chat.room.${props.room.id}`);
 const page = usePage<SharedData>();
 const currentUser = page.props.auth.user as User;
-
-const roomEcho = useEcho(`chat.room.${props.room.id}`);
 
 const messages = ref<Message[]>([]);
 const newMessage = ref('');
@@ -45,16 +45,13 @@ watch(
     { deep: true },
 );
 
-const sendMessage = () => {
-    if (newMessage.value.trim() !== '') {
-        axios
-            .post(`/chat/room/${props.room.id}/message`, {
-                text: newMessage.value,
-            })
-            .then(() => {
-                newMessage.value = '';
-            });
+const sendMessage = async () => {
+    if (newMessage.value.trim() === '') {
+        return;
     }
+
+    await saveMessage(props.room.id, newMessage.value);
+    newMessage.value = '';
 };
 
 const sendTypingEvent = () => {
@@ -64,10 +61,19 @@ const sendTypingEvent = () => {
     });
 };
 
+const fetchMessagesFromApi = async () => {
+    const [apiMessages, error] = await getMessages(props.room.id);
+
+    if (error) {
+        // TODO: show error notification
+        return;
+    }
+
+    messages.value = apiMessages;
+};
+
 onMounted(() => {
-    axios.get(`/chat/room/${props.room.id}/message`).then((response) => {
-        messages.value = response.data;
-    });
+    fetchMessagesFromApi();
 
     roomEcho
         .channel()
@@ -97,11 +103,13 @@ onMounted(() => {
         <div class="flex h-[calc(100%-60px)] flex-col justify-end">
             <div ref="messagesContainer" class="max-h-fit overflow-y-auto p-4">
                 <div v-for="message in messages" :key="message.id" class="mb-2 flex items-center">
-                    <div v-if="message.user_id === currentUser.id" class="ml-auto rounded-lg bg-blue-500 p-2 text-white">
-                        {{ message.text }}
+                    <div v-if="message.user_id === currentUser.id" class="ml-auto rounded-lg bg-blue-500 px-4 py-2 text-white">
+                        <p>{{ message.text }}</p>
+                        <span class="text-[9px] block text-right">{{ formatTime(message.created_at) }}</span>
                     </div>
-                    <div v-else class="mr-auto rounded-lg bg-gray-200 p-2 text-black">
-                        {{ message.text }}
+                    <div v-else class="mr-auto rounded-lg bg-gray-200 px-4 py-2 text-black">
+                        <p>{{ message.text }}</p>
+                        <span class="text-[9px] block text-right">{{ formatTime(message.created_at) }}</span>
                     </div>
                 </div>
             </div>
