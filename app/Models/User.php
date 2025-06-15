@@ -58,4 +58,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * @noinspection PhpVoidFunctionResultUsedInspection
+     * @noinspection PhpDynamicAsStaticMethodCallInspection
+     *
+     * @todo Made another checks, like user is blocked on room? banned? etc...
+     */
+    public function canJoinRoom(int $roomId): bool
+    {
+        return ChatRoomUser::userInRoom($this->id, $roomId)->exists();
+    }
 }

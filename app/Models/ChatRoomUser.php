@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,4 +18,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-class ChatRoomUser extends Model {}
+class ChatRoomUser extends Model
+{
+    #[Scope]
+    protected function userInRoom(Builder $query, $userId, $roomId): void
+    {
+        $query->where('user_id', $userId)
+            ->where('chat_room_id', $roomId);
+    }
+}

@@ -13,6 +13,9 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
+        <template v-slot:badge>
+            <slot name="badge" />
+        </template>
         <slot />
     </AppLayout>
 </template>
