@@ -57,36 +57,4 @@ OBS: Você pode logar com o 'user2@example.com' para visualizar melhor o chat em
 
 ---
 ## Em desenvolvimento
-**TODO:**
-### Backend
-- [x] Corrigir autenticação em `routes/channels.php`
-- [ ] Criar novas rotas:
-    - [ ] pessoas (lista de usuários para iniciar uma nova conversa/sala)
-        - [ ] permitir ver quem está online/offline
-        - [ ] exibir total de usuários online
-    - [ ] conversas/salas (lista de conversas já iniciadas)
-- [ ] permitir anexar imagens e enviar emojis nas mensagens
-- [ ] ...?
-
-### Frontend
-- [ ] Refatorar:
-    - [ ] Criar service para AppChat/sendMessage
-    - [ ] Criar service para AppChat/onMounted get messages
-- [x] Acrescentar tipagem no componente do chat
-- [ ] Melhorar visual do chat:
-    - [ ] scroll apenas no container do chat não na tela inteira
-    - [x] disposição do componente 'digitando';
-    - [ ] mostrar se usuário está online/offline;
-    - [ ] permitir criar grupos de conversa (adicionar mais de um usuário na conversa);
-    - [ ] permitir anexar imagens e enviar emojis nas mensagens;
-- [ ] Adicionar i18n
-- [ ] Adicionar novos itens de menu:
-    - [ ] pessoas (lista de usuários)
-    - [ ] mensagens (lista de conversas já iniciadas)
-- [ ] Novas telas:
-    - [ ] dashboard (refazer)
-    - [ ] usuários (iniciar novas conversas)
-        -  [ ] permitir criar novas conversas/salas (1:1 ou grupo)
-        -  [ ] permitir ver quem está online/offline
-    - [ ] conversas/salas (lista de conversas já iniciadas)
-- [ ] ...?
+[TODO](https://github.com/chsjr1996/brain.md/blob/main/Computa%C3%A7%C3%A3o%20geral/Dev/Projetos/Laravel%20reverb%20chat/TODO.md)

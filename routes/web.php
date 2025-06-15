@@ -1,19 +1,15 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+Route::get('/', [WelcomeController::class, 'show'])->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(callback: function () {
+    require __DIR__.'/web-modules/chat.php';
 
-Route::middleware('auth')->prefix('chat')->name('chat')->group(function () {
-    require __DIR__.'/web-modules/chat-rooms.php';
-    require __DIR__.'/web-modules/chat-messages.php';
+    Route::get('dashboard', [DashboardController::class, 'show'])->name('dashboard');
 });
 
 require __DIR__.'/web-modules/settings.php';
