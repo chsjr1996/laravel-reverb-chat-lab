@@ -3,12 +3,14 @@
  * @todo allow to detect multiple users typing at the same time
  */
 
+import { Button } from '@/components/ui/button';
+import { formatTime, getFriendData } from '@/lib/utils';
 import { getMessages, saveMessage } from '@/services/chatMessageService';
 import { type ChatRoom, type Message, type SharedData, type User } from '@/types';
-import { usePage } from '@inertiajs/vue3';
-import { useEcho } from '@laravel/echo-vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { useEcho, useEchoPresence } from '@laravel/echo-vue';
+import { ChevronLeft } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, watch } from 'vue';
-import { formatTime } from '@/lib/utils';
 
 type whisperTypingResponse = {
     userID: number;
@@ -20,14 +22,18 @@ const props = defineProps<{
 }>();
 
 const roomEcho = useEcho(`chat.room.${props.room.id}`);
+const chatPresenceEcho = useEchoPresence('chat');
 const page = usePage<SharedData>();
 const currentUser = page.props.auth.user as User;
+const isRoom = !!props.room;
+const roomUsers = isRoom ? props.room.users : [];
 
 const messages = ref<Message[]>([]);
 const newMessage = ref('');
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const someIsTyping = ref(false);
 const someIsTypingTimer = ref<number | null>(null);
+const isUserOnline = ref(false);
 const isTypingUser = ref<Pick<User, 'id' | 'name'> | null>(null);
 
 watch(
@@ -44,6 +50,14 @@ watch(
     },
     { deep: true },
 );
+
+const getChatName = () => {
+    if (!props.room.is_group) {
+        return getFriendData(props.room.users, currentUser.id)?.name || 'Unknown User';
+    }
+
+    return props.room.name || 'Group Chat';
+};
 
 const sendMessage = async () => {
     if (newMessage.value.trim() === '') {
@@ -95,22 +109,47 @@ onMounted(() => {
                 someIsTyping.value = false;
             }, 1000);
         });
+
+    if (isRoom && !props.room.is_group) {
+        chatPresenceEcho.channel().here((users: User[]) => {
+            isUserOnline.value = users.some((user) => user.id === getFriendData(roomUsers, currentUser.id).id);
+        });
+
+        chatPresenceEcho.channel().joining((user: User) => {
+            if (user.id === getFriendData(roomUsers, currentUser.id).id) isUserOnline.value = true;
+        });
+
+        chatPresenceEcho.channel().leaving((user: User) => {
+            if (user.id === getFriendData(roomUsers, currentUser.id).id) isUserOnline.value = false;
+        });
+    }
 });
 </script>
 
 <template>
     <div class="h-full">
-        <div class="flex h-[calc(100%-60px)] flex-col justify-end">
+        <div id="chatMessageHeader" class="flex h-[50px] w-full items-center border-b">
+            <Link href="/chat/room">
+                <Button class="ml-4 h-[30px] w-[30px] cursor-pointer" variant="ghost">
+                    <ChevronLeft />
+                </Button>
+            </Link>
+            <span class="text-foreground ml-4 font-normal">{{ getChatName() }}</span>
+            <div v-if="!room.is_group" class="ml-4 flex">
+                <span :class="isUserOnline ? 'bg-green-500' : 'bg-gray-400'" class="inline-block h-3 w-3 rounded-full"></span>
+            </div>
+        </div>
+        <div class="flex h-[calc(100%-110px)] flex-col justify-end">
             <div ref="messagesContainer" class="max-h-fit overflow-y-auto p-4">
                 <div v-for="message in messages" :key="message.id" class="mb-2 flex items-center">
                     <div v-if="message.user_id === currentUser.id" class="ml-auto rounded-lg bg-blue-500 px-4 py-2 text-white">
                         <p>{{ message.text }}</p>
-                        <span class="text-[9px] block text-right">{{ formatTime(message.created_at) }}</span>
+                        <span class="block text-right text-[9px]">{{ formatTime(message.created_at) }}</span>
                     </div>
                     <div v-else class="mr-auto rounded-lg bg-gray-200 px-4 py-2 text-black">
                         <strong v-if="room.is_group">{{ message.user!.name }}</strong>
                         <p>{{ message.text }}</p>
-                        <span class="text-[9px] block text-right">{{ formatTime(message.created_at) }}</span>
+                        <span class="block text-right text-[9px]">{{ formatTime(message.created_at) }}</span>
                     </div>
                 </div>
             </div>
@@ -125,7 +164,9 @@ onMounted(() => {
                 placeholder="Type a message..."
                 class="h-[50px] flex-1 border-t px-2"
             />
-            <button @click="sendMessage" class="h-[50px] rounded-br-lg bg-blue-500 px-4 text-white">Send</button>
+            <Button @click="sendMessage" class="h-[50px] cursor-pointer rounded-none rounded-br-lg bg-blue-500 px-4 text-white hover:bg-blue-600">
+                Send
+            </Button>
         </div>
     </div>
 </template>

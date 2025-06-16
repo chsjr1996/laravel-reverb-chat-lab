@@ -10,8 +10,8 @@ export const getAppName = (): string => {
     return import.meta.env.VITE_APP_NAME || 'My Application';
 };
 
-export const getFriendData = (users: User[], currentUserId: number): User => {
-    return users.filter((user) => user.id !== currentUserId)[0];
+export const getFriendData = (users: User[], currentUserId: number): User | undefined => {
+    return users.find((user) => user.id !== currentUserId);
 };
 
 export const formatTime = (datetime: string, onlyTime = true): string => {

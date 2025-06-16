@@ -38,7 +38,7 @@ const getRoomName = (room: ChatRoom): string => {
 
 <template>
     <div>
-        <div v-for="room in rooms" :key="room.id" class="h-[80px] border-b">
+        <div v-for="room in rooms" :key="room.id" class="h-[80px] border-b hover:bg-neutral-900">
             <Link class="flex items-center h-full w-full cursor-pointer p-4" :href="'/chat/room/' + room.id">
                 <Avatar class="h-10 w-10 overflow-hidden rounded-full">
                     <AvatarImage v-if="getRoomAvatar(room)" :src="getRoomAvatar(room)" :alt="getRoomName(room)" />
