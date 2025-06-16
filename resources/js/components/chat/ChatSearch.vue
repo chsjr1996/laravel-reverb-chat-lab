@@ -11,7 +11,12 @@ onMounted(() => {
 
 <template>
     <div class="w-full">
-        <input ref="inputElement" type="text" placeholder="Search messages and users..." class="h-[50px] w-full flex-1 rounded-tl-xl border-b px-2" />
+        <input
+            ref="inputElement"
+            type="text"
+            placeholder="Search messages and users..."
+            class="h-[50px] w-full flex-1 rounded-tl-xl border-b px-4 focus-visible:outline-0"
+        />
     </div>
 </template>
 

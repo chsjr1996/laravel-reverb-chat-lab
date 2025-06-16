@@ -4,7 +4,7 @@
  */
 
 import { Button } from '@/components/ui/button';
-import { formatTime, getFriendData } from '@/lib/utils';
+import { formatTime, getFriendData, getRoomName } from '@/lib/utils';
 import { getMessages, saveMessage } from '@/services/chatMessageService';
 import { type ChatRoom, type Message, type SharedData, type User } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
@@ -35,6 +35,7 @@ const someIsTyping = ref(false);
 const someIsTypingTimer = ref<number | null>(null);
 const isUserOnline = ref(false);
 const isTypingUser = ref<Pick<User, 'id' | 'name'> | null>(null);
+const inputMessage = ref<HTMLInputElement | null>(null);
 
 watch(
     messages,
@@ -50,14 +51,6 @@ watch(
     },
     { deep: true },
 );
-
-const getChatName = () => {
-    if (!props.room.is_group) {
-        return getFriendData(props.room.users, currentUser.id)?.name || 'Unknown User';
-    }
-
-    return props.room.name || 'Group Chat';
-};
 
 const sendMessage = async () => {
     if (newMessage.value.trim() === '') {
@@ -112,16 +105,20 @@ onMounted(() => {
 
     if (isRoom && !props.room.is_group) {
         chatPresenceEcho.channel().here((users: User[]) => {
-            isUserOnline.value = users.some((user) => user.id === getFriendData(roomUsers, currentUser.id).id);
+            isUserOnline.value = users.some((user) => user.id === getFriendData(roomUsers, currentUser.id)!.id);
         });
 
         chatPresenceEcho.channel().joining((user: User) => {
-            if (user.id === getFriendData(roomUsers, currentUser.id).id) isUserOnline.value = true;
+            if (user.id === getFriendData(roomUsers, currentUser.id)!.id) isUserOnline.value = true;
         });
 
         chatPresenceEcho.channel().leaving((user: User) => {
-            if (user.id === getFriendData(roomUsers, currentUser.id).id) isUserOnline.value = false;
+            if (user.id === getFriendData(roomUsers, currentUser.id)!.id) isUserOnline.value = false;
         });
+    }
+
+    if (inputMessage.value) {
+        inputMessage.value.focus();
     }
 });
 </script>
@@ -134,7 +131,7 @@ onMounted(() => {
                     <ChevronLeft />
                 </Button>
             </Link>
-            <span class="text-foreground ml-4 font-normal">{{ getChatName() }}</span>
+            <span class="text-foreground ml-4 font-normal">{{ getRoomName(props.room, currentUser.id) }}</span>
             <div v-if="!room.is_group" class="ml-4 flex">
                 <span :class="isUserOnline ? 'bg-green-500' : 'bg-gray-400'" class="inline-block h-3 w-3 rounded-full"></span>
             </div>
@@ -157,12 +154,13 @@ onMounted(() => {
         <small v-if="someIsTyping" class="absolute bottom-[55px] left-[10px] text-gray-500"> {{ isTypingUser?.name }} is typing... </small>
         <div class="absolute bottom-0 flex w-full items-center">
             <input
+                ref="inputMessage"
                 type="text"
                 v-model="newMessage"
                 @keydown="sendTypingEvent"
                 @keyup.enter="sendMessage"
                 placeholder="Type a message..."
-                class="h-[50px] flex-1 border-t px-2"
+                class="h-[50px] flex-1 border-t px-2 focus-visible:outline-0"
             />
             <Button @click="sendMessage" class="h-[50px] cursor-pointer rounded-none rounded-br-lg bg-blue-500 px-4 text-white hover:bg-blue-600">
                 Send

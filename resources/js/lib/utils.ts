@@ -1,4 +1,4 @@
-import type { User } from '@/types';
+import type { ChatRoom, User } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,6 +13,14 @@ export const getAppName = (): string => {
 export const getFriendData = (users: User[], currentUserId: number): User | undefined => {
     return users.find((user) => user.id !== currentUserId);
 };
+
+export const getRoomName = (room: ChatRoom, currentUserId: number) => {
+    if (room.is_group) {
+        return room.name;
+    }
+
+    return getFriendData(room.users, currentUserId)!.name;
+}
 
 export const formatTime = (datetime: string, onlyTime = true): string => {
     const options = onlyTime

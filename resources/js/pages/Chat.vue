@@ -40,7 +40,7 @@ watch(
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-row rounded-xl p-4">
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-[400px] rounded-l-xl border md:min-h-min">
-                <chat-search @registered-input="el => searchInput = el" />
+                <chat-search @registered-input="(el) => (searchInput = el)" />
                 <chat-room-list :rooms="rooms" />
             </div>
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-r-xl border md:min-h-min">
