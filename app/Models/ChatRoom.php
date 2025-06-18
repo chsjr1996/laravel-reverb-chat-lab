@@ -44,11 +44,15 @@ class ChatRoom extends Model
     }
 
     #[Scope]
-    protected function withCurrentUser(Builder $query): void
+    protected function whereHasCurrentUser(Builder $query): void
     {
-        $query->whereHas('users', function ($query) {
-            $query->where('user_id', auth()->id());
-        })->with('users');
+        $query->whereHas('users', fn ($q) => $q->where('user_id', auth()->id()));
+    }
+
+    #[Scope]
+    protected function whereHasUser(Builder $query, int $userId): void
+    {
+        $query->whereHas('users', fn ($q) => $q->where('user_id', $userId));
     }
 
     #[Scope]

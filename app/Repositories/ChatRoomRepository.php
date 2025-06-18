@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Interfaces\ChatRoomRepositoryInterface;
+use App\Models\ChatRoom;
+use App\Models\ChatRoomUser;
+use InvalidArgumentException;
+
+class ChatRoomRepository extends BaseRepository implements ChatRoomRepositoryInterface
+{
+    protected string $model = ChatRoom::class;
+
+    public function listWhereHasCurrentUser()
+    {
+        return $this->resolvedModel->newQuery()
+            ->whereHasCurrentUser()
+            ->withLastMessage()
+            ->with('users')
+            ->get();
+    }
+
+    public function findChatRoomByUsers(int $userId, bool $private = false)
+    {
+        return $this->resolvedModel->newQuery()
+            ->whereHasCurrentUser()
+            ->whereHasUser($userId)
+            ->when($private, fn ($q) => $q->where('is_group', false))
+            ->with('users')
+            ->first();
+    }
+
+    /**
+     * Return an array containing a chat room and a boolean indicating whether it was created.
+     * 
+     * @param int $id
+     * @param int|null $friendId
+     * @return array
+     */
+    public function findOrCreate(int $id, ?int $friendId = null): array
+    {
+        if ($id) {
+            return [$this->find($id), false];
+        }
+
+        if (! $friendId) {
+            throw new InvalidArgumentException('Friend ID is required to create a chat room.');
+        }
+
+        $chatRoom = ChatRoom::create();
+        ChatRoomUser::insert([
+            ['chat_room_id' => $chatRoom->id, 'user_id' => auth()->user()->id],
+            ['chat_room_id' => $chatRoom->id, 'user_id' => $friendId],
+        ]);
+
+        return [$chatRoom, true];
+    }
+}

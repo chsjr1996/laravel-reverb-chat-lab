@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
+use App\Http\Requests\UserIndexRequest;
+use App\Http\Resources\UserResource;
+use App\Interfaces\UserRepositoryInterface;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class UserController extends Controller
 {
-    public function index(): JsonResponse
+    public function __construct(private UserRepositoryInterface $userRepository) {}
+
+    public function index(UserIndexRequest $request): AnonymousResourceCollection
     {
-        return response()->json(['message' => 'not implemented yet']);
+        $users = $this->userRepository->list($request->validated());
+
+        return UserResource::collection($users);
     }
 }

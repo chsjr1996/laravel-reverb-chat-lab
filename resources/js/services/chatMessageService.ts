@@ -12,9 +12,16 @@ export const getMessages = async (chatRoomId: number) => {
     }
 };
 
-export const saveMessage = async (chatRoomId: number, text: string) => {
+export const saveMessage = async (text: string, chatRoomId?: number, friendId?: number) => {
     try {
-        const { data } = await api.post(`/chat/message/${chatRoomId}`, { text });
+        const chatRoomIdToUse = chatRoomId || 0;
+        const requestData: { text: string; friend_id?: number } = {
+            text,
+        };
+
+        if (friendId) requestData['friend_id'] = friendId;
+
+        const { data } = await api.post(`/chat/message/${chatRoomIdToUse}`, requestData);
 
         return [data, false];
     } catch (error) {

@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -68,5 +70,28 @@ class User extends Authenticatable
     public function canJoinRoom(int $roomId): bool
     {
         return ChatRoomUser::userInRoom($this->id, $roomId)->exists();
+    }
+
+    #[Scope]
+    public function excludeLoggedInUser(Builder $query): void
+    {
+        $query->where('id', '!=', auth()->user()->id);
+    }
+
+    #[Scope]
+    public function excludeFriends(Builder $query): void
+    {
+        $loggedInUserId = auth()->id();
+
+        $chatRoomIds = ChatRoomUser::where('user_id', $loggedInUserId)
+            ->pluck('chat_room_id');
+
+        // TODO: Buggy, listing users with started chat rooms yet...
+        $query->whereNotIn('id', function ($subQuery) use ($chatRoomIds, $loggedInUserId) {
+            $subQuery->select('id')
+                ->from('chat_room_users')
+                ->whereIn('chat_room_id', $chatRoomIds)
+                ->where('user_id', '!=', $loggedInUserId);
+        });
     }
 }

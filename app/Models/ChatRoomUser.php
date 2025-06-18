@@ -20,6 +20,16 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ChatRoomUser extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'chat_room_id',
+        'user_id',
+    ];
+
     #[Scope]
     protected function userInRoom(Builder $query, $userId, $roomId): void
     {

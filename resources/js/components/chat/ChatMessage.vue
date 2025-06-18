@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { formatTime, getFriendData, getRoomName } from '@/lib/utils';
 import { getMessages, saveMessage } from '@/services/chatMessageService';
 import { type ChatRoom, type Message, type SharedData, type User } from '@/types';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { useEcho, useEchoPresence } from '@laravel/echo-vue';
 import { ChevronLeft } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, watch } from 'vue';
@@ -18,10 +18,11 @@ type whisperTypingResponse = {
 };
 
 const props = defineProps<{
-    room: ChatRoom;
+    room?: ChatRoom;
+    user?: { data: Pick<User, 'id' | 'name'> };
 }>();
 
-const roomEcho = useEcho(`chat.room.${props.room.id}`);
+const roomEcho = props.room ? useEcho(`chat.room.${props.room.id}`) : null;
 const chatPresenceEcho = useEchoPresence('chat');
 const page = usePage<SharedData>();
 const currentUser = page.props.auth.user as User;
@@ -53,15 +54,16 @@ watch(
 );
 
 const sendMessage = async () => {
-    if (newMessage.value.trim() === '') {
-        return;
-    }
+    if (newMessage.value.trim() === '') return;
 
-    await saveMessage(props.room.id, newMessage.value);
+    await saveMessage(newMessage.value, props.room?.id, props.user?.data.id);
     newMessage.value = '';
+    router.reload();
 };
 
 const sendTypingEvent = () => {
+    if (!roomEcho) return;
+
     roomEcho.channel().whisper('typing', {
         userID: currentUser.id,
         userName: currentUser.name,
@@ -69,6 +71,8 @@ const sendTypingEvent = () => {
 };
 
 const fetchMessagesFromApi = async () => {
+    if (!props.room) return;
+
     const [apiMessages, error] = await getMessages(props.room.id);
 
     if (error) {
@@ -79,8 +83,20 @@ const fetchMessagesFromApi = async () => {
     messages.value = apiMessages;
 };
 
-onMounted(() => {
-    fetchMessagesFromApi();
+const getChatName = () => {
+    if (isRoom) {
+        return getRoomName(props.room, currentUser.id);
+    }
+
+    if (props.user) {
+        return props.user.data.name;
+    }
+
+    return 'Unknown';
+};
+
+const listenEchoEvents = () => {
+    if (!roomEcho) return;
 
     roomEcho
         .channel()
@@ -102,20 +118,30 @@ onMounted(() => {
                 someIsTyping.value = false;
             }, 1000);
         });
+};
 
-    if (isRoom && !props.room.is_group) {
-        chatPresenceEcho.channel().here((users: User[]) => {
-            isUserOnline.value = users.some((user) => user.id === getFriendData(roomUsers, currentUser.id)!.id);
-        });
+const startPresenceEcho = () => {
+    if (isRoom && props.room.is_group) return;
 
-        chatPresenceEcho.channel().joining((user: User) => {
-            if (user.id === getFriendData(roomUsers, currentUser.id)!.id) isUserOnline.value = true;
-        });
+    const friendUserId = isRoom ? getFriendData(roomUsers, currentUser.id)!.id : props.user!.data.id;
 
-        chatPresenceEcho.channel().leaving((user: User) => {
-            if (user.id === getFriendData(roomUsers, currentUser.id)!.id) isUserOnline.value = false;
-        });
-    }
+    chatPresenceEcho.channel().here((users: User[]) => {
+        isUserOnline.value = users.some((user) => user.id === friendUserId);
+    });
+
+    chatPresenceEcho.channel().joining((user: User) => {
+        if (user.id === friendUserId) isUserOnline.value = true;
+    });
+
+    chatPresenceEcho.channel().leaving((user: User) => {
+        if (user.id === friendUserId) isUserOnline.value = false;
+    });
+};
+
+onMounted(() => {
+    fetchMessagesFromApi();
+    listenEchoEvents();
+    startPresenceEcho();
 
     if (inputMessage.value) {
         inputMessage.value.focus();
@@ -131,8 +157,8 @@ onMounted(() => {
                     <ChevronLeft />
                 </Button>
             </Link>
-            <span class="text-foreground ml-4 font-normal">{{ getRoomName(props.room, currentUser.id) }}</span>
-            <div v-if="!room.is_group" class="ml-4 flex">
+            <span class="text-foreground ml-4 font-normal">{{ getChatName() }}</span>
+            <div v-if="!isRoom || !room?.is_group" class="ml-4 flex">
                 <span :class="isUserOnline ? 'bg-green-500' : 'bg-gray-400'" class="inline-block h-3 w-3 rounded-full"></span>
             </div>
         </div>
@@ -144,7 +170,7 @@ onMounted(() => {
                         <span class="block text-right text-[9px]">{{ formatTime(message.created_at) }}</span>
                     </div>
                     <div v-else class="mr-auto rounded-lg bg-gray-200 px-4 py-2 text-black">
-                        <strong v-if="room.is_group">{{ message.user!.name }}</strong>
+                        <strong v-if="room && room.is_group">{{ message.user!.name }}</strong>
                         <p>{{ message.text }}</p>
                         <span class="block text-right text-[9px]">{{ formatTime(message.created_at) }}</span>
                     </div>
