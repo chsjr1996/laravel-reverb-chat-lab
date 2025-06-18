@@ -86,12 +86,13 @@ class User extends Authenticatable
         $chatRoomIds = ChatRoomUser::where('user_id', $loggedInUserId)
             ->pluck('chat_room_id');
 
-        // TODO: Buggy, listing users with started chat rooms yet...
         $query->whereNotIn('id', function ($subQuery) use ($chatRoomIds, $loggedInUserId) {
-            $subQuery->select('id')
+            $subQuery->select('user_id')
                 ->from('chat_room_users')
+                ->join('chat_rooms', 'chat_rooms.id', '=', 'chat_room_users.chat_room_id')
                 ->whereIn('chat_room_id', $chatRoomIds)
-                ->where('user_id', '!=', $loggedInUserId);
+                ->where('user_id', '!=', $loggedInUserId)
+                ->where('chat_rooms.is_group', false);
         });
     }
 }

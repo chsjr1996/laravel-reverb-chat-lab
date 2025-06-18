@@ -22,10 +22,11 @@ const props = defineProps<{
 const breadcrumbs = ref<BreadcrumbItem[]>([
     {
         title: 'Messages',
-        href: '/chat/room',
-    },
+        href: '/chat/room'
+    }
 ]);
 const searchInput = ref<HTMLInputElement | null>(null);
+const searchText = ref('');
 
 watch(
     () => props.room,
@@ -34,10 +35,10 @@ watch(
 
         breadcrumbs.value.push({
             title: 'Chat',
-            href: `/chat/room/${newRoomValue.id}`,
+            href: `/chat/room/${newRoomValue.id}`
         });
     },
-    { deep: true, immediate: true },
+    { deep: true, immediate: true }
 );
 </script>
 
@@ -46,7 +47,7 @@ watch(
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-row rounded-xl p-4">
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-[400px] rounded-l-xl border md:min-h-min">
-                <chat-search @registered-input="(el) => (searchInput = el)" />
+                <chat-search :search-text="searchText" @registered-input="(el) => (searchInput = el)" />
                 <chat-room-list :rooms="rooms" />
                 <chat-user-list />
             </div>

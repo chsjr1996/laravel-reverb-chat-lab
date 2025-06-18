@@ -1,21 +1,39 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { Input } from '@/components/ui/input';
+import { type HTMLAttributes, onMounted, ref } from 'vue';
+import { useVModel } from '@vueuse/core';
 
-const emit = defineEmits(['registeredInput']);
-const inputElement = ref<HTMLInputElement | null>(null);
+const props = defineProps<{
+    defaultValue?: string | number
+    modelValue?: string | number
+    class?: HTMLAttributes['class']
+}>()
+
+const searchInputElement = ref<HTMLInputElement | null>(null);
+
+const emits = defineEmits<{
+    searchText: (e: 'update:modelValue', payload: string | number) => void,
+    registeredInput: (el: HTMLInputElement | null) => void,
+}>()
+
+const modelValue = useVModel(props, 'modelValue', emits, {
+    passive: true,
+    defaultValue: props.defaultValue,
+})
 
 onMounted(() => {
-    emit('registeredInput', inputElement.value);
+    emits.registeredInput(searchInputElement.value);
 });
 </script>
 
 <template>
     <div class="w-full">
-        <input
-            ref="inputElement"
+        <Input
+            ref="searchInputElement"
+            v-model="modelValue"
             type="text"
             placeholder="Search messages and users..."
-            class="h-[50px] w-full flex-1 rounded-tl-xl border-b px-4 focus-visible:outline-0"
+            class="h-[50px] w-full flex-1 rounded-none rounded-tl-xl border-b border-none px-4 focus-visible:border-none focus-visible:ring-0 focus-visible:outline-0"
         />
     </div>
 </template>

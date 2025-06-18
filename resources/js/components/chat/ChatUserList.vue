@@ -29,6 +29,10 @@ onMounted(() => {
 
 <template>
     <div>
+        <div class="mt-4 mb-2">
+            <strong class="ml-4">Users</strong>
+        </div>
+        <hr />
         <div v-for="user in users" :key="user.id" class="h-[80px] border-b hover:bg-neutral-900">
             <Link class="flex h-full w-full cursor-pointer items-center p-4" :href="'/chat/room/user/' + user.id">
                 <Avatar class="h-10 w-10 overflow-hidden rounded-full">
