@@ -186,7 +186,7 @@ onMounted(() => {
                 @keydown="sendTypingEvent"
                 @keyup.enter="sendMessage"
                 placeholder="Type a message..."
-                class="h-[50px] flex-1 border-t px-2 focus-visible:outline-0"
+                class="h-[50px] flex-1 border-t px-4 focus-visible:outline-0"
             />
             <Button @click="sendMessage" class="h-[50px] cursor-pointer rounded-none rounded-br-lg bg-blue-500 px-4 text-white hover:bg-blue-600">
                 Send
