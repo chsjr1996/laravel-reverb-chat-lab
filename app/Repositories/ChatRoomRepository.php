@@ -17,6 +17,13 @@ class ChatRoomRepository extends BaseRepository implements ChatRoomRepositoryInt
             ->whereHasCurrentUser()
             ->withLastMessage()
             ->with('users')
+            ->orderByDesc(function ($query) {
+                $query->select('created_at')
+                    ->from('chat_messages')
+                    ->whereColumn('chat_room_id', 'chat_rooms.id')
+                    ->latest()
+                    ->limit(1);
+            })
             ->get();
     }
 
@@ -32,7 +39,7 @@ class ChatRoomRepository extends BaseRepository implements ChatRoomRepositoryInt
 
     /**
      * Return an array containing a chat room and a boolean indicating whether it was created.
-     * 
+     *
      * @param int $id
      * @param int|null $friendId
      * @return array

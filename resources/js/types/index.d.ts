@@ -46,6 +46,7 @@ export interface Message {
     updated_at: string,
     deleted_at?: string | null,
     user?: Pick<User, 'id' | 'name' | 'avatar'>,
+    new_chat?: boolean;
 }
 
 export interface ChatRoom {

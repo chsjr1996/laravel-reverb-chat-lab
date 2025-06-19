@@ -95,4 +95,21 @@ class User extends Authenticatable
                 ->where('chat_rooms.is_group', false);
         });
     }
+
+    /**
+     * @todo improve where insensitive search to another DBMS
+     */
+    #[Scope]
+    public function searchByName(Builder $query, string $search): void
+    {
+        $sanitizedSearch = str($search)
+            ->trim()
+            ->lower();
+
+        if (empty($sanitizedSearch)) {
+            return;
+        }
+
+        $query->where('name', 'ilike', '%'.$sanitizedSearch.'%');
+    }
 }

@@ -4,6 +4,7 @@
  */
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { formatTime, getFriendData, getRoomName } from '@/lib/utils';
 import { getMessages, saveMessage } from '@/services/chatMessageService';
 import { type ChatRoom, type Message, type SharedData, type User } from '@/types';
@@ -56,8 +57,19 @@ watch(
 const sendMessage = async () => {
     if (newMessage.value.trim() === '') return;
 
-    await saveMessage(newMessage.value, props.room?.id, props.user?.data.id);
+    const [messageData, error] = await saveMessage(newMessage.value, props.room?.id, props.user?.data.id);
+
+    if (error) {
+        // TODO: show error notification
+        return;
+    }
+
     newMessage.value = '';
+
+    if (messageData.data.new_chat && messageData.data.chat_room_id) {
+        window.location.href = `/chat/room/${messageData.data.chat_room_id}`;
+    }
+    // TODO: improve this, we should not reload the page because it re-run all queries
     router.reload();
 };
 
@@ -179,14 +191,14 @@ onMounted(() => {
         </div>
         <small v-if="someIsTyping" class="absolute bottom-[55px] left-[10px] text-gray-500"> {{ isTypingUser?.name }} is typing... </small>
         <div class="absolute bottom-0 flex w-full items-center">
-            <input
+            <Input
                 ref="inputMessage"
                 type="text"
                 v-model="newMessage"
                 @keydown="sendTypingEvent"
                 @keyup.enter="sendMessage"
                 placeholder="Type a message..."
-                class="h-[50px] flex-1 border-t px-4 focus-visible:outline-0"
+                class="h-[50px] flex-1 rounded-none border-0 border-t px-4 focus-visible:ring-0 focus-visible:outline-0"
             />
             <Button @click="sendMessage" class="h-[50px] cursor-pointer rounded-none rounded-br-lg bg-blue-500 px-4 text-white hover:bg-blue-600">
                 Send

@@ -24,6 +24,7 @@ class UserIndexRequest extends FormRequest
         return [
             'exclude_current_user' => ['nullable', 'bool'],
             'exclude_friends' => ['nullable', 'bool'],
+            'name' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

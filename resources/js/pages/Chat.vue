@@ -49,7 +49,7 @@ watch(
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-[400px] rounded-l-xl border md:min-h-min">
                 <chat-search ref="searchInput" @update:model-value="(value) => (searchText = value)" @registered-input="(el) => (searchInput = el)" />
                 <chat-room-list :rooms="rooms" />
-                <chat-user-list v-if="searchText" />
+                <chat-user-list :search-text="searchText" />
             </div>
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-r-xl border md:min-h-min">
                 <chat-message v-if="room || user" :room="room" :user="user" />
