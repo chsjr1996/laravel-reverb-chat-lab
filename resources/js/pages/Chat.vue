@@ -48,8 +48,10 @@ watch(
         <div class="flex h-full flex-1 flex-row rounded-xl p-4">
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-[400px] rounded-l-xl border md:min-h-min">
                 <chat-search ref="searchInput" @update:model-value="(value) => (searchText = value)" @registered-input="(el) => (searchInput = el)" />
-                <chat-room-list :rooms="rooms" :search-text="searchText" />
-                <chat-user-list :search-text="searchText" />
+                <div class="h-[calc(100vh-148px)] overflow-y-auto">
+                    <chat-room-list :rooms="rooms" :search-text="searchText" />
+                    <chat-user-list :search-text="searchText" />
+                </div>
             </div>
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-r-xl border md:min-h-min">
                 <chat-message v-if="room || user" :room="room" :user="user" />
