@@ -9,15 +9,20 @@ import ChatRoomList from '@/components/chat/ChatRoomList.vue';
 import ChatSearch from '@/components/chat/ChatSearch.vue';
 import ChatUserList from '@/components/chat/ChatUserList.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, type ChatRoom, type User } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { type BreadcrumbItem, type ChatRoom, type SharedData, type User } from '@/types';
+import { Head, usePage } from '@inertiajs/vue3';
+import { useEcho } from '@laravel/echo-vue';
+import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
     rooms: ChatRoom[];
     room?: ChatRoom;
     user?: { data: Pick<User, 'id' | 'name'> };
 }>();
+
+const page = usePage<SharedData>();
+const { id: currentUserId } = page.props.auth.user as User;
+const roomObserverEcho = useEcho(`chat.room.observer.${currentUserId}`);
 
 const breadcrumbs = ref<BreadcrumbItem[]>([
     {
@@ -27,6 +32,7 @@ const breadcrumbs = ref<BreadcrumbItem[]>([
 ]);
 const searchInput = ref<HTMLInputElement | null>(null);
 const searchText = ref('');
+const currentRooms = ref(props.rooms);
 
 watch(
     () => props.room,
@@ -40,6 +46,12 @@ watch(
     },
     { deep: true, immediate: true },
 );
+
+onMounted(() => {
+    roomObserverEcho.channel().listen('ChatCreated', (response: { chatRoom: ChatRoom }) => {
+        currentRooms.value.unshift(response.chatRoom);
+    });
+});
 </script>
 
 <template>
@@ -49,7 +61,7 @@ watch(
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-[400px] rounded-l-xl border md:min-h-min">
                 <chat-search ref="searchInput" @update:model-value="(value) => (searchText = value)" @registered-input="(el) => (searchInput = el)" />
                 <div class="h-[calc(100vh-148px)] overflow-y-auto">
-                    <chat-room-list :rooms="rooms" :search-text="searchText" />
+                    <chat-room-list :rooms="currentRooms" :search-text="searchText" />
                     <chat-user-list :search-text="searchText" />
                 </div>
             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChatCreated;
 use App\Events\MessageSent;
 use App\Http\Resources\CreatedMessageResource;
 use App\Interfaces\ChatRoomRepositoryInterface;
@@ -41,6 +42,15 @@ class ChatMessageController extends Controller
         ]);
 
         broadcast(new MessageSent($message));
+
+        if ($newRoom) {
+            $chatRoom->load('users');
+            $chatRoom->load(['messages' => function ($query) {
+                $query->latest()->take(1);
+            }]);
+
+            broadcast(new ChatCreated($validated['friend_id'], $chatRoom));
+        }
 
         return new CreatedMessageResource($message, $newRoom);
     }
