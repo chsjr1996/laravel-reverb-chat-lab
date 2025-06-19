@@ -43,6 +43,13 @@ class ChatRoom extends Model
         return $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
     }
 
+    public function loadUsersAndLastMessage(): void
+    {
+        $this->load(['users', 'messages' => function ($query) {
+            $query->latest()->take(1);
+        }]);
+    }
+
     #[Scope]
     protected function whereHasCurrentUser(Builder $query): void
     {

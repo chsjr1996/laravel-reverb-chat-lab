@@ -4,52 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Events\ChatCreated;
 use App\Events\MessageSent;
+use App\Http\Requests\MessageStoreRequest;
 use App\Http\Resources\CreatedMessageResource;
+use App\Interfaces\ChatMessageRepositoryInterface;
 use App\Interfaces\ChatRoomRepositoryInterface;
-use App\Models\ChatMessage;
 use App\Models\ChatRoom;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class ChatMessageController extends Controller
 {
-    public function __construct(private ChatRoomRepositoryInterface $chatRoomRepository) {}
+    public function __construct(
+        private readonly ChatRoomRepositoryInterface $chatRoomRepository,
+        private readonly ChatMessageRepositoryInterface $chatMessageRepository
+    ) {}
 
     public function index(ChatRoom $chatRoom): Collection
     {
-        return ChatMessage::query()
-            ->where('chat_room_id', $chatRoom->id)
-            ->with('user:id,name')
-            ->orderBy('id', 'asc')
-            ->get();
+        return $this->chatMessageRepository->list([
+            'chat_room_id' => $chatRoom->id,
+        ]);
     }
 
-    public function store(Request $request, int $roomId)
+    public function store(MessageStoreRequest $request, int $roomId): CreatedMessageResource
     {
-        // TODO: move to FormRequest file
-        $validated = $request->validate([
-            'text' => 'required|string|max:255',
-            'friend_id' => 'nullable|integer|exists:users,id',
-        ]);
+        $validatedRequest = $request->validated();
 
         [$chatRoom, $newRoom] = $this->chatRoomRepository
-            ->findOrCreate($roomId, $validated['friend_id'] ?? null);
+            ->findOrCreate($roomId, $validatedRequest['friend_id'] ?? null);
 
-        $message = ChatMessage::create([
+        $message = $this->chatMessageRepository->create([
             'chat_room_id' => $chatRoom->id,
             'user_id' => auth()->user()->id,
-            'text' => $validated['text'],
+            'text' => $validatedRequest['text'],
         ]);
 
         broadcast(new MessageSent($message));
 
         if ($newRoom) {
-            $chatRoom->load('users');
-            $chatRoom->load(['messages' => function ($query) {
-                $query->latest()->take(1);
-            }]);
-
-            broadcast(new ChatCreated($validated['friend_id'], $chatRoom));
+            $chatRoom->loadUsersAndLastMessage();
+            broadcast(new ChatCreated($validatedRequest['friend_id'], $chatRoom));
         }
 
         return new CreatedMessageResource($message, $newRoom);

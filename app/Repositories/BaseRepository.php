@@ -20,7 +20,7 @@ abstract class BaseRepository
         $this->resolvedModel = $this->resolveModel();
     }
 
-    public function create(array $data = []): bool
+    public function create(array $data = []): mixed
     {
         return $this->resolvedModel->fill($data)->save();
     }

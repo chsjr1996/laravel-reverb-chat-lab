@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 interface BaseRepositoryInterface
 {
-    public function create(array $data = []): bool;
+    public function create(array $data = []): mixed;
 
     public function list(array $filters = []): Collection;
 

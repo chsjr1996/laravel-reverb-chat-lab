@@ -39,10 +39,6 @@ class ChatRoomRepository extends BaseRepository implements ChatRoomRepositoryInt
 
     /**
      * Return an array containing a chat room and a boolean indicating whether it was created.
-     *
-     * @param int $id
-     * @param int|null $friendId
-     * @return array
      */
     public function findOrCreate(int $id, ?int $friendId = null): array
     {
