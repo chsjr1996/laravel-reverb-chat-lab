@@ -52,8 +52,8 @@ watch(
 
 <template>
     <div v-if="searchTerm">
-        <div class="mt-4 mb-2">
-            <strong class="ml-4">Users</strong>
+        <div class="mt-6 mb-2">
+            <strong class="ml-4 text-xl">Users</strong>
         </div>
         <hr />
         <template v-if="users.length">
@@ -73,7 +73,7 @@ watch(
                 </Link>
             </div>
         </template>
-        <div v-else class="mt-2 ml-4">
+        <div v-else-if="!searchLoading" class="mt-2 ml-4">
             <p>No results</p>
         </div>
         <div v-if="searchLoading" class="mt-2 ml-4">

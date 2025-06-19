@@ -112,4 +112,10 @@ class User extends Authenticatable
 
         $query->where('name', 'ilike', '%'.$sanitizedSearch.'%');
     }
+
+    #[Scope]
+    protected function searchOrder(Builder $query): void
+    {
+        $query->orderBy('name');
+    }
 }

@@ -15,7 +15,10 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         return $this->resolvedModel->newQuery()
             ->when($filters['exclude_current_user'] ?? 0, fn ($q) => $q->excludeLoggedInUser())
             ->when($filters['exclude_friends'] ?? 0, fn ($q) => $q->excludeFriends())
-            ->when($filters['name'] ?? '', fn ($q) => $q->searchByName($filters['name']))
+            ->when($filters['name'] ?? '', fn ($q) => $q
+                ->searchByName($filters['name'])
+                ->searchOrder()
+            )
             ->get();
     }
 }
