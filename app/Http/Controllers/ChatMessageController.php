@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ChatCreated;
+use App\Events\ChatRoomCreated;
 use App\Events\MessageSent;
 use App\Http\Requests\MessageStoreRequest;
 use App\Http\Resources\CreatedMessageResource;
@@ -42,7 +42,7 @@ class ChatMessageController extends Controller
 
         if ($newRoom) {
             $chatRoom->loadUsersAndLastMessage();
-            broadcast(new ChatCreated($validatedRequest['friend_id'], $chatRoom));
+            broadcast(new ChatRoomCreated($validatedRequest['friend_id'], $chatRoom));
         }
 
         return new CreatedMessageResource($message, $newRoom);

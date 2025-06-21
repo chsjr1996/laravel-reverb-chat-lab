@@ -18,6 +18,7 @@ const props = defineProps<{
     rooms: ChatRoom[];
     room?: ChatRoom;
     user?: { data: Pick<User, 'id' | 'name'> };
+    selectedRoomId?: number;
 }>();
 
 const page = usePage<SharedData>();
@@ -48,7 +49,7 @@ watch(
 );
 
 onMounted(() => {
-    roomObserverEcho.channel().listen('ChatCreated', (response: { chatRoom: ChatRoom }) => {
+    roomObserverEcho.channel().listen('ChatRoomCreated', (response: { chatRoom: ChatRoom }) => {
         currentRooms.value.unshift(response.chatRoom);
     });
 });
@@ -60,8 +61,8 @@ onMounted(() => {
         <div class="flex h-full flex-1 flex-row rounded-xl p-4">
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-[400px] rounded-l-xl border md:min-h-min">
                 <chat-search ref="searchInput" @update:model-value="(value) => (searchText = value)" @registered-input="(el) => (searchInput = el)" />
-                <div class="h-[calc(100vh-148px)] overflow-y-auto">
-                    <chat-room-list :rooms="currentRooms" :search-text="searchText" />
+                <div class="h-[calc(100vh-148px)] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700">
+                    <chat-room-list :rooms="currentRooms" :search-text="searchText" :selected-room-id="selectedRoomId" />
                     <chat-user-list :search-text="searchText" />
                 </div>
             </div>

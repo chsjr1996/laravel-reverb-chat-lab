@@ -30,6 +30,11 @@ sail artisan migrate
 sail artisan db:seed --class=ChatExampleSeeder
 ```
 
+**Optional:** If you want to populate only users, run:
+```bash
+sail artisan ti --execute "User::factory(20)->create()"
+```
+
 Set up the application key:
 ```bash
 sail artisan key:generate
@@ -47,10 +52,13 @@ sail artisan reverb:start
 
 Access the application in the browser at the url [http://localhost/login](http://localhost/login).
 
-### Example Seeder
+### Example Seeder or Tinker user factory
 If you have run the "ChatExampleSeeder" seeder, you can use the example user:
 - user: user1@example.com
 - password: password
+
+Or if you run the Tinker user factory, you get any created user from DB and go to
+[chat room](http://localhost/chat/room) and search by any name to start a new chat room.
 
 Access the screen [http://localhost/chat/room/1](http://localhost/chat/room/1) to see the chat in action.
 NOTE: You can log in with 'user2@example.com' to better view the chat in real time.

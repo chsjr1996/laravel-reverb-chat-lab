@@ -34,6 +34,7 @@ class ChatRoomController extends Controller
         return inertia('Chat', [
             'rooms' => $this->chatRoomRepository->listWhereHasCurrentUser(),
             'room' => $chatRoom,
+            'selectedRoomId' => $chatRoom->id,
         ]);
     }
 

@@ -9,6 +9,7 @@ import { ref, watch } from 'vue';
 const { rooms, searchText } = defineProps<{
     rooms?: ChatRoom[];
     searchText?: string;
+    selectedRoomId?: number;
 }>();
 
 const page = usePage<SharedData>();
@@ -28,6 +29,12 @@ const getRoomAvatar = (room: ChatRoom) => {
     }
 
     return '';
+};
+
+const getLastMessageText = (room: ChatRoom) => {
+    const lastMessage = room.messages ? room.messages[0].text : '';
+
+    return lastMessage.length > 30 ? lastMessage.substring(0, 30) + '...' : lastMessage;
 };
 
 watch(
@@ -51,8 +58,14 @@ watch(
         <div v-if="searchText?.trim() !== ''" class="mt-6 mb-2">
             <strong class="ml-4 text-xl">Chats</strong>
         </div>
+        <hr v-if="searchText?.trim() !== ''" />
         <template v-if="currentRooms?.length">
-            <div v-for="room in currentRooms" :key="room.id" class="h-[80px] border-b hover:bg-neutral-100 dark:hover:bg-neutral-900">
+            <div
+                v-for="room in currentRooms"
+                :key="room.id"
+                class="h-[80px] border-b hover:bg-neutral-100 dark:hover:bg-neutral-900"
+                :class="{ 'bg-neutral-100 dark:bg-neutral-900': room.id === selectedRoomId }"
+            >
                 <Link class="flex h-full w-full cursor-pointer items-center p-4" :href="'/chat/room/' + room.id">
                     <Avatar class="h-10 w-10 overflow-hidden rounded-full">
                         <AvatarImage v-if="getRoomAvatar(room)" :src="getRoomAvatar(room)" :alt="getRoomName(room, currentUserId)" />
@@ -68,7 +81,7 @@ watch(
                             </span>
                         </div>
                         <span v-if="room.messages && room.messages[0]" class="text-muted-foreground text-sm">
-                            {{ room.messages[0].text }}
+                            {{ getLastMessageText(room) }}
                         </span>
                     </div>
                 </Link>

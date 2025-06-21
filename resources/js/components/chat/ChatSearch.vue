@@ -23,7 +23,7 @@ defineExpose({ focus });
             ref="searchInputElement"
             @update:model-value="(value) => emit('update:modelValue', value)"
             type="text"
-            placeholder="Search messages and users..."
+            placeholder="Search chats and users..."
             class="h-[50px] w-full flex-1 rounded-none rounded-tl-xl border-0 border-b px-4 focus-visible:ring-0 focus-visible:outline-0"
         />
     </div>
