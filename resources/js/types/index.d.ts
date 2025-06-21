@@ -61,3 +61,5 @@ export interface ChatRoom {
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;
+
+export type ChatActionModesType = 'default' | 'create_group';
