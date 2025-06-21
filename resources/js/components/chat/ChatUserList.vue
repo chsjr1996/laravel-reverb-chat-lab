@@ -57,7 +57,7 @@ watch(
         </div>
         <hr />
         <template v-if="users.length">
-            <div v-for="user in users" :key="user.id" class="h-[80px] border-b hover:bg-neutral-900">
+            <div v-for="user in users" :key="user.id" class="h-[80px] border-b hover:bg-neutral-100 dark:hover:bg-neutral-900">
                 <Link class="flex h-full w-full cursor-pointer items-center p-4" :href="'/chat/room/user/' + user.id">
                     <Avatar class="h-10 w-10 overflow-hidden rounded-full">
                         <AvatarImage v-if="user.avatar" :src="user.avatar" :alt="user.name" />
