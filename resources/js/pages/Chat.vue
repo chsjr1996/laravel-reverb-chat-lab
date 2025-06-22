@@ -47,6 +47,13 @@ const handleChatActionMode = (mode: ChatActionModesType) => {
     }
 };
 
+// TODO: need to clear search input
+const handleGroupCreated = () => {
+    chatActionMode.value = 'default';
+    searchText.value = '';
+    selectedUsers.value = {};
+};
+
 const handleCheckedUsersUpdate = (users: Record<number, boolean>) => {
     selectedUsers.value = users;
 };
@@ -91,17 +98,14 @@ onMounted(() => {
                         :search-text="searchText"
                         :selected-room-id="selectedRoomId"
                     />
-                    <chat-user-list
-                        :chat-action-mode="chatActionMode"
-                        :search-text="searchText"
-                        @update:checked-users="handleCheckedUsersUpdate"
-                    />
+                    <chat-user-list :chat-action-mode="chatActionMode" :search-text="searchText" @update:checked-users="handleCheckedUsersUpdate" />
                 </div>
                 <chat-actions-menu v-if="chatActionMode === 'default'" :search-input-ref="searchInput" @change-action-mode="handleChatActionMode" />
                 <chat-create-group-action
                     v-if="chatActionMode === 'create_group'"
-                    @change-action-mode="handleChatActionMode"
                     :selected-users="selectedUsers"
+                    @change-action-mode="handleChatActionMode"
+                    @groupCreated="handleGroupCreated"
                 />
             </div>
             <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-r-xl border md:min-h-min">

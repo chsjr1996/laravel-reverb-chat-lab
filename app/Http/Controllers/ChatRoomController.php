@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGroupChatRoomRequest;
 use App\Http\Resources\UserResource;
 use App\Interfaces\ChatRoomRepositoryInterface;
 use App\Models\ChatRoom;
@@ -15,9 +16,15 @@ class ChatRoomController extends Controller
 {
     public function __construct(private ChatRoomRepositoryInterface $chatRoomRepository) {}
 
-    public function store()
+    public function store(StoreGroupChatRoomRequest $request)
     {
-        //
+        $validatedRequest = $request->validated();
+        $chatRoom = $this->chatRoomRepository->createGroupChatRoom($validatedRequest);
+
+        // TODO: broadcast the new chat room creation event for all users in the room
+
+        return redirect(route('chat.room.show', $chatRoom))
+            ->with('success', __('Chat room created successfully.'));
     }
 
     public function index(): InertiaResponse|ResponseFactory

@@ -26,6 +26,16 @@ class ChatRoom extends Model
     /** @use HasFactory<\Database\Factories\ChatRoomFactory> */
     use HasFactory, SoftDeletes;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'is_group',
+    ];
+
     public function users(): HasManyThrough
     {
         return $this->hasManyThrough(

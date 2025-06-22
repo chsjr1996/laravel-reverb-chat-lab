@@ -2,40 +2,53 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { type ChatActionModesType } from '@/types';
+import { useForm } from '@inertiajs/vue3';
 import { Check, X } from 'lucide-vue-next';
-import { ref } from 'vue';
 
-const groupName = ref<string>('');
+const form = useForm<{
+    name: string;
+    users: string[];
+}>({
+    name: '',
+    users: [],
+});
 
 const { selectedUsers } = defineProps<{
     selectedUsers: Record<number, boolean>;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
     (e: 'changeActionMode', value: ChatActionModesType): void;
+    (e: 'groupCreated'): void;
 }>();
 
-const handleCreateGroup = () => {
+const submit = async () => {
     const selectedUserIds = Object.keys(selectedUsers).filter((userId) => selectedUsers[Number(userId)]);
     if (selectedUserIds.length <= 0) return;
 
-    console.log('Creating group with users:', {
-        name: groupName.value,
-        users: selectedUsers
+    form.users = selectedUserIds;
+    form.post(route('chat.room.store'), {
+        onSuccess: () => {
+            emit('groupCreated');
+        },
+        onFinish: () => {
+            form.reset('name');
+            form.reset('users');
+        },
     });
 };
 </script>
 
 <template>
-    <div class="flex h-[50px] w-full items-center justify-between border-t-1">
+    <form @submit.prevent="submit" class="flex h-[50px] w-full items-center justify-between border-t-1">
         <Button @click="$emit('changeActionMode', 'default')" variant="ghost" class="group-action-button mx-2">
             <X />
         </Button>
-        <Input placeholder="Group name" v-model="groupName" />
-        <Button @click="handleCreateGroup" variant="ghost" class="group-action-button mx-2">
+        <Input placeholder="Group name" v-model="form.name" required />
+        <Button type="submit" variant="ghost" class="group-action-button mx-2">
             <Check />
         </Button>
-    </div>
+    </form>
 </template>
 
 <style scoped>

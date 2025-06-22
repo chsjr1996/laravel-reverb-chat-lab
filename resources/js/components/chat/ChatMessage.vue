@@ -107,6 +107,14 @@ const getChatName = () => {
     return 'Unknown';
 };
 
+const getGroupRoomUsersCount = () => {
+    if (!props.room || !props.room.is_group) return 0;
+
+    const usersCount = props.room.users.length;
+
+    return usersCount > 2 ? `${usersCount} users` : `${usersCount} user`;
+};
+
 const listenEchoEvents = () => {
     if (!roomEcho) return;
 
@@ -169,7 +177,8 @@ onMounted(() => {
                     <ChevronLeft />
                 </Button>
             </Link>
-            <span class="text-foreground ml-4 font-normal">{{ getChatName() }}</span>
+            <strong class="text-foreground ml-4">{{ getChatName() }}</strong>
+            <span v-if="room?.is_group" class="text-muted-foreground text-sm ml-3">{{ getGroupRoomUsersCount() }}</span>
             <div v-if="!isRoom || !room?.is_group" class="ml-4 flex">
                 <span :class="isUserOnline ? 'bg-green-500' : 'bg-gray-400'" class="inline-block h-3 w-3 rounded-full"></span>
             </div>
@@ -180,11 +189,11 @@ onMounted(() => {
                 class="max-h-fit overflow-y-auto px-4 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700"
             >
                 <div v-for="message in messages" :key="message.id" class="mt-2 mb-2 flex items-center">
-                    <div v-if="message.user_id === currentUser.id" class="max-w-[220px] ml-auto rounded-lg bg-blue-500 px-4 py-2 text-white">
+                    <div v-if="message.user_id === currentUser.id" class="ml-auto max-w-[220px] rounded-lg bg-blue-500 px-4 py-2 text-white">
                         <p>{{ message.text }}</p>
                         <span class="block text-right text-[9px]">{{ formatTime(message.created_at) }}</span>
                     </div>
-                    <div v-else class="max-w-[220px] mr-auto rounded-lg bg-gray-200 px-4 py-2 text-black">
+                    <div v-else class="mr-auto max-w-[220px] rounded-lg bg-gray-200 px-4 py-2 text-black">
                         <strong v-if="room && room.is_group">{{ message.user!.name }}</strong>
                         <p>{{ message.text }}</p>
                         <span class="block text-right text-[9px]">{{ formatTime(message.created_at) }}</span>

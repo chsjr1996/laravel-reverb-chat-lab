@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @todo Need to refresh the user list when chatActionMode changes.
+ */
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getInitials } from '@/composables/useInitials';
@@ -23,7 +27,13 @@ const searchTimeout = ref<number | null>(null);
 const checkedUsers = ref<Record<number, boolean>>({});
 
 const fetchUsers = async () => {
-    const [apiUsers, error] = await getUsers(['exclude_current_user=1', 'exclude_friends=1', 'name=' + encodeURIComponent(searchTerm.value)]);
+    const params = ['exclude_current_user=1', 'name=' + encodeURIComponent(searchTerm.value)];
+
+    if (chatActionMode === 'default') {
+        params.push('exclude_friends=1');
+    }
+
+    const [apiUsers, error] = await getUsers(params);
 
     if (error) {
         // TODO: show error notification
@@ -65,9 +75,13 @@ watch(
     },
 );
 
-watch(checkedUsers, (newCheckedUsers) => {
-    emit('update:checkedUsers', newCheckedUsers);
-}, { deep: true });
+watch(
+    checkedUsers,
+    (newCheckedUsers) => {
+        emit('update:checkedUsers', newCheckedUsers);
+    },
+    { deep: true },
+);
 </script>
 
 <template>

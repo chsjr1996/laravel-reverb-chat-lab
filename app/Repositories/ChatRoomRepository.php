@@ -5,11 +5,41 @@ namespace App\Repositories;
 use App\Interfaces\ChatRoomRepositoryInterface;
 use App\Models\ChatRoom;
 use App\Models\ChatRoomUser;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class ChatRoomRepository extends BaseRepository implements ChatRoomRepositoryInterface
 {
     protected string $model = ChatRoom::class;
+
+    public function createGroupChatRoom(array $data): ChatRoom
+    {
+        return DB::transaction(function () use ($data) {
+            $chatRoom = ChatRoom::create([
+                'name' => $data['name'],
+                'is_group' => true,
+            ]);
+
+            $chatRoomUsers = [];
+            $chatRoomUsers[] = [
+                'chat_room_id' => $chatRoom->id,
+                'user_id' => auth()->user()->id,
+                'is_admin' => true,
+            ];
+
+            foreach ($data['users'] as $user) {
+                $chatRoomUsers[] = [
+                    'chat_room_id' => $chatRoom->id,
+                    'user_id' => $user,
+                    'is_admin' => false,
+                ];
+            }
+
+            ChatRoomUser::insert($chatRoomUsers);
+
+            return $chatRoom;
+        });
+    }
 
     public function listWhereHasCurrentUser()
     {
