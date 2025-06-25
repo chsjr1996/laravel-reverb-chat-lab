@@ -185,3 +185,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*
+    ---custom---
+ */
+.custom-scrollbar {
+    @apply [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+}

@@ -81,8 +81,11 @@ onMounted(() => {
 <template>
     <Head title="Chat" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-row rounded-xl p-4">
-            <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-[400px] rounded-l-xl border md:min-h-min">
+        <div class="flex h-full flex-1 flex-row rounded-xl p-0 md:p-4">
+            <div
+                class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-full border sm:rounded-l-xl md:min-h-min md:w-[400px]"
+                :class="{ 'hidden xl:block': room || user }"
+            >
                 <chat-search
                     ref="searchInput"
                     :chat-action-mode="chatActionMode"
@@ -91,7 +94,7 @@ onMounted(() => {
                     @registered-input="(el) => (searchInput = el)"
                 />
                 <div
-                    class="h-[calc(100vh-198px)] overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700"
+                    class="h-[calc(100vh-198px)] overflow-y-auto custom-scrollbar"
                 >
                     <chat-room-list
                         v-if="chatActionMode === 'default'"
@@ -109,7 +112,10 @@ onMounted(() => {
                     @groupCreated="handleGroupCreated"
                 />
             </div>
-            <div class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-r-xl border md:min-h-min">
+            <div
+                class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 md:rounded-r-xl border md:min-h-min"
+                :class="{ 'hidden xl:block': !room && !user }"
+            >
                 <chat-message v-if="room || user" :room="room" :user="user" />
                 <chat-placeholder v-else :search-input-ref="searchInput" />
             </div>

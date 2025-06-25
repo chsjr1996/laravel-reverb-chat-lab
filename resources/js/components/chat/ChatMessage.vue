@@ -10,7 +10,7 @@ import { getMessages, saveMessage } from '@/services/chatMessageService';
 import { type ChatRoom, type Message, type SharedData, type User } from '@/types';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useEcho, useEchoPresence } from '@laravel/echo-vue';
-import { ChevronLeft } from 'lucide-vue-next';
+import { ChevronLeft, SendHorizonal } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, watch } from 'vue';
 
 type whisperTypingResponse = {
@@ -178,7 +178,7 @@ onMounted(() => {
                 </Button>
             </Link>
             <strong class="text-foreground ml-4">{{ getChatName() }}</strong>
-            <span v-if="room?.is_group" class="text-muted-foreground text-sm ml-3">{{ getGroupRoomUsersCount() }}</span>
+            <span v-if="room?.is_group" class="text-muted-foreground ml-3 text-sm">{{ getGroupRoomUsersCount() }}</span>
             <div v-if="!isRoom || !room?.is_group" class="ml-4 flex">
                 <span :class="isUserOnline ? 'bg-green-500' : 'bg-gray-400'" class="inline-block h-3 w-3 rounded-full"></span>
             </div>
@@ -186,7 +186,7 @@ onMounted(() => {
         <div class="flex h-[calc(100%-100px)] flex-col justify-end">
             <div
                 ref="messagesContainer"
-                class="max-h-fit overflow-y-auto px-4 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700"
+                class="max-h-fit overflow-y-auto px-4 custom-scrollbar"
             >
                 <div v-for="message in messages" :key="message.id" class="mt-2 mb-2 flex items-center">
                     <div v-if="message.user_id === currentUser.id" class="ml-auto max-w-[220px] rounded-lg bg-blue-500 px-4 py-2 text-white">
@@ -212,8 +212,8 @@ onMounted(() => {
                 placeholder="Type a message..."
                 class="h-[50px] flex-1 rounded-none border-0 border-t px-4 focus-visible:ring-0 focus-visible:outline-0"
             />
-            <Button @click="sendMessage" class="h-[50px] cursor-pointer rounded-none rounded-br-lg bg-blue-500 px-4 text-white hover:bg-blue-600">
-                Send
+            <Button @click="sendMessage" variant="ghost" class="absolute right-2 h-[40px] w-[40px] cursor-pointer px-4 text-white sm:rounded-br-lg">
+                <SendHorizonal />
             </Button>
         </div>
     </div>

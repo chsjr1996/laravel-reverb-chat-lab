@@ -63,7 +63,7 @@ onMounted(() => {
             @update:model-value="(value) => emit('update:modelValue', value)"
             type="text"
             :placeholder="getInputPlaceholder()"
-            class="h-[50px] w-full flex-1 rounded-none rounded-tl-xl border-0 border-b px-4 pl-13 focus-visible:ring-0 focus-visible:outline-0"
+            class="h-[50px] w-full flex-1 rounded-none sm:rounded-tl-xl border-0 border-b px-4 pl-13 focus-visible:ring-0 focus-visible:outline-0"
         />
     </div>
 </template>
