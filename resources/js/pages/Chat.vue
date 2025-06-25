@@ -34,7 +34,7 @@ const breadcrumbs = ref<BreadcrumbItem[]>([
     },
 ]);
 const searchInput = ref<HTMLInputElement | null>(null);
-const searchText = ref('');
+const searchText = ref<string | number>('');
 const currentRooms = ref(props.rooms);
 const chatActionMode = ref<ChatActionModesType>('default');
 const selectedUsers = ref<Record<number, boolean>>({});
@@ -59,13 +59,13 @@ const handleCheckedUsersUpdate = (users: Record<number, boolean>) => {
 };
 
 watch(
-    () => props.room,
-    (newRoomValue) => {
-        if (!newRoomValue) return;
+    () => props.room?.id,
+    (newRoomId, prevRoomId) => {
+        if (!newRoomId || newRoomId === prevRoomId) return;
 
         breadcrumbs.value.push({
             title: 'Chat',
-            href: `/chat/room/${newRoomValue.id}`,
+            href: `/chat/room/${newRoomId}`,
         });
     },
     { deep: true, immediate: true },
@@ -86,6 +86,7 @@ onMounted(() => {
                 <chat-search
                     ref="searchInput"
                     :chat-action-mode="chatActionMode"
+                    @change-action-mode="handleChatActionMode"
                     @update:model-value="(value) => (searchText = value)"
                     @registered-input="(el) => (searchInput = el)"
                 />

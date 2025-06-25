@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { type ChatActionModesType } from '@/types';
 import { useForm } from '@inertiajs/vue3';
-import { Check, X } from 'lucide-vue-next';
+import { Check } from 'lucide-vue-next';
 
 const form = useForm<{
     name: string;
@@ -40,21 +40,17 @@ const submit = async () => {
 </script>
 
 <template>
-    <form @submit.prevent="submit" class="flex h-[50px] w-full items-center justify-between border-t-1">
-        <Button @click="$emit('changeActionMode', 'default')" variant="ghost" class="group-action-button mx-2">
-            <X />
-        </Button>
-        <Input placeholder="Group name" v-model="form.name" required />
-        <Button type="submit" variant="ghost" class="group-action-button mx-2">
+    <form @submit.prevent="submit" class="relative flex h-[50px] w-full items-center justify-between border-t-1">
+        <Input
+            class="h-[50px] w-full flex-1 rounded-none rounded-bl-xl border-0 border-t px-4 pr-13 focus-visible:ring-0 focus-visible:outline-0"
+            placeholder="Group name"
+            v-model="form.name"
+            required
+        />
+        <Button type="submit" variant="ghost" class="absolute right-0 mx-2 h-[40px] w-[40px] cursor-pointer">
             <Check />
         </Button>
     </form>
 </template>
 
-<style scoped>
-.group-action-button {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-}
-</style>
+<style scoped></style>

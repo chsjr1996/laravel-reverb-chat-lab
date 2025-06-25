@@ -8,7 +8,7 @@ import { ref, watch } from 'vue';
 
 const { rooms, searchText } = defineProps<{
     rooms?: ChatRoom[];
-    searchText?: string;
+    searchText?: string | number;
     selectedRoomId?: number;
 }>();
 
