@@ -34,7 +34,7 @@ const breadcrumbs = ref<BreadcrumbItem[]>([
     },
 ]);
 const searchInput = ref<HTMLInputElement | null>(null);
-const searchText = ref<string | number>('');
+const searchText = ref<string>('');
 const currentRooms = ref(props.rooms);
 const chatActionMode = ref<ChatActionModesType>('default');
 const selectedUsers = ref<Record<number, boolean>>({});
@@ -81,10 +81,10 @@ onMounted(() => {
 <template>
     <Head title="Chat" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-row rounded-xl p-0 md:p-4">
+        <div class="flex h-full flex-1 flex-row rounded-xl p-0 lg:p-4">
             <div
-                class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] w-full border sm:rounded-l-xl md:min-h-min md:w-[400px]"
-                :class="{ 'hidden xl:block': room || user }"
+                class="border-sidebar-border/70 dark:border-sidebar-border relative lg:min-h-[100vh] w-full border lg:rounded-l-xl lg:min-h-min lg:w-[350px]"
+                :class="{ 'hidden lg:block': room || user }"
             >
                 <chat-search
                     ref="searchInput"
@@ -94,7 +94,7 @@ onMounted(() => {
                     @registered-input="(el) => (searchInput = el)"
                 />
                 <div
-                    class="h-[calc(100vh-198px)] overflow-y-auto custom-scrollbar"
+                    class="h-[calc(100vh-168px)] lg:h-[calc(100vh-215px)] overflow-y-auto custom-scrollbar"
                 >
                     <chat-room-list
                         v-if="chatActionMode === 'default'"
@@ -113,8 +113,8 @@ onMounted(() => {
                 />
             </div>
             <div
-                class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 md:rounded-r-xl border md:min-h-min"
-                :class="{ 'hidden xl:block': !room && !user }"
+                class="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 lg:rounded-r-xl border md:min-h-min"
+                :class="{ 'hidden lg:block': !room && !user }"
             >
                 <chat-message v-if="room || user" :room="room" :user="user" />
                 <chat-placeholder v-else :search-input-ref="searchInput" />

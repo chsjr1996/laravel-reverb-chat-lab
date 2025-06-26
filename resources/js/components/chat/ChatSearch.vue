@@ -11,7 +11,7 @@ const { chatActionMode } = defineProps<{
 
 const emit = defineEmits<{
     (e: 'registeredInput', inputElement: HTMLInputElement | null): void;
-    (e: 'update:modelValue', value: string | number): void;
+    (e: 'update:modelValue', value: string): void;
     (e: 'changeActionMode', value: ChatActionModesType): void;
 }>();
 const searchText = ref<string | number>('');
@@ -60,10 +60,10 @@ onMounted(() => {
         <Input
             v-model="searchText"
             ref="searchInputElement"
-            @update:model-value="(value) => emit('update:modelValue', value)"
+            @update:model-value="(value) => emit('update:modelValue', value as string)"
             type="text"
             :placeholder="getInputPlaceholder()"
-            class="h-[50px] w-full flex-1 rounded-none sm:rounded-tl-xl border-0 border-b px-4 pl-13 focus-visible:ring-0 focus-visible:outline-0"
+            class="h-[50px] w-full flex-1 rounded-none lg:rounded-tl-xl border-0 border-b px-4 pl-13 focus-visible:ring-0 focus-visible:outline-0"
         />
     </div>
 </template>

@@ -42,7 +42,7 @@ const submit = async () => {
 <template>
     <form @submit.prevent="submit" class="relative flex h-[50px] w-full items-center justify-between border-t-1">
         <Input
-            class="h-[50px] w-full flex-1 rounded-none rounded-bl-xl border-0 border-t px-4 pr-13 focus-visible:ring-0 focus-visible:outline-0"
+            class="h-[50px] w-full flex-1 rounded-none lg:rounded-bl-xl border-0 border-t px-4 pr-13 focus-visible:ring-0 focus-visible:outline-0"
             placeholder="Group name"
             v-model="form.name"
             required

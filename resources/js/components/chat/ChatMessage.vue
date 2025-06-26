@@ -170,7 +170,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="h-[calc(100vh-98px)]">
+    <div class="h-[calc(100vh-168px)] md:h-[calc(100vh-114px)]">
         <div id="chatMessageHeader" class="flex h-[50px] w-full items-center border-b">
             <Link href="/chat/room">
                 <Button class="ml-4 h-[30px] w-[30px] cursor-pointer" variant="ghost">
@@ -212,7 +212,7 @@ onMounted(() => {
                 placeholder="Type a message..."
                 class="h-[50px] flex-1 rounded-none border-0 border-t px-4 focus-visible:ring-0 focus-visible:outline-0"
             />
-            <Button @click="sendMessage" variant="ghost" class="absolute right-2 h-[40px] w-[40px] cursor-pointer px-4 text-white sm:rounded-br-lg">
+            <Button @click="sendMessage" variant="ghost" class="absolute right-2 h-[40px] w-[40px] cursor-pointer px-4 text-white">
                 <SendHorizonal />
             </Button>
         </div>

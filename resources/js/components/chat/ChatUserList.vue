@@ -13,7 +13,7 @@ import { ref, watch } from 'vue';
 
 const { chatActionMode, searchText } = defineProps<{
     chatActionMode: ChatActionModesType;
-    searchText?: string | number;
+    searchText?: string;
 }>();
 
 const emit = defineEmits<{

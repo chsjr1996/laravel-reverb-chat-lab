@@ -20,12 +20,14 @@ export const getRoomName = (room: ChatRoom, currentUserId: number) => {
     }
 
     return getFriendData(room.users, currentUserId)!.name;
-}
+};
 
 export const formatTime = (datetime: string, onlyTime = true): string => {
-    const options = onlyTime
+    const options: Intl.DateTimeFormatOptions = onlyTime
         ? { hour: '2-digit', minute: '2-digit' }
         : { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
 
     return new Date(datetime).toLocaleTimeString([], options);
 };
+
+export const formatDate = (datetime: string): string => new Date(datetime).toLocaleDateString();

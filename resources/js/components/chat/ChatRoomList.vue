@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/composables/useInitials';
-import { formatTime, getFriendData, getRoomName } from '@/lib/utils';
+import { formatDate, formatTime, getFriendData, getRoomName } from '@/lib/utils';
 import type { ChatRoom, SharedData, User } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
 const { rooms, searchText } = defineProps<{
     rooms?: ChatRoom[];
-    searchText?: string | number;
+    searchText?: string;
     selectedRoomId?: number;
 }>();
 
@@ -77,12 +77,17 @@ watch(
                         <div class="flex w-full items-center">
                             <span class="flex flex-1">{{ getRoomName(room, currentUserId) }}</span>
                             <span v-if="room.messages && room.messages[0]" class="text-muted-foreground text-xs">
-                                {{ formatTime(room.messages[0].created_at, false) }}
+                                {{ formatDate(room.messages[0].created_at) }}
                             </span>
                         </div>
-                        <span v-if="room.messages && room.messages[0]" class="text-muted-foreground text-sm">
-                            {{ getLastMessageText(room) }}
-                        </span>
+                        <div class="flex w-full items-center justify-between">
+                            <span v-if="room.messages && room.messages[0]" class="text-muted-foreground text-sm">
+                                {{ getLastMessageText(room) }}
+                            </span>
+                            <span v-if="room.messages && room.messages[0]" class="text-muted-foreground text-xs">
+                                {{ formatTime(room.messages[0].created_at) }}
+                            </span>
+                        </div>
                     </div>
                 </Link>
             </div>
